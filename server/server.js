@@ -7,15 +7,15 @@ var {User} = require('./models/user');
 
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // to parse the json from client
+
 app.post('/todos',(req,res)=>{
     console.log('POST REQUEST');
-    // get the body sent by client
-    console.log('REceived :',req.body.text)
+    // creating a new collection
     var todo = new Todo ({
         text:req.body.text
     })
-    
+    // saving this collection to database
     todo.save().then( (doc)=>{ 
         res.send(doc);  // send the saved file in DB back to client
     }, (e)=>{
@@ -26,10 +26,11 @@ app.post('/todos',(req,res)=>{
 
 app.get('/todos' , (req,res)=>{
     console.log('GET REQUEST');
+    // Query to fetch all the data from database
     Todo.find().then( (todos)=>{
-        res.send(todos); 
+        res.send(todos);  // send the data back to client (later filter out using authentication)
     }, (e)=>{
-        res.status(400).send(e);
+        res.status(400).send(e); // send the error
     } )
 })
 app.listen(3000,()=>{
