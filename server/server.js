@@ -13,19 +13,29 @@ app.use(bodyParser.json()); // to parse the json from client
 
 app.post('/todos',(req,res)=>{
     console.log('POST REQUEST');
-    // creating a new collection
     var todo = new Todo ({
         text:req.body.text
     })
-    // saving this collection to database
     todo.save().then( (doc)=>{ 
+        
         res.send(doc);  // send the saved file in DB back to client
     }, (e)=>{
         res.status(400).send(e);  // send the error 
     } )
     console.log(req.body);
 })
-
+app.post('/users', (req,res)=>{
+    var body = _.pick(req.body, ['email','password']);
+    var user = new User(body);
+    user.save().then( ()=>{
+        user.generateAuthToken().then( (token)=>{
+            res.header('x-auth',token).send(user);
+        } )
+        //res.send(doc);
+    } , (e)=>{
+        res.status(400).send(e);
+    })
+})
 app.get('/todos' , (req,res)=>{
     console.log('GET REQUEST');
     // Query to fetch all the data from database
