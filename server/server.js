@@ -8,6 +8,7 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {ObjectId} = require('mongodb');
 var app = express();
+var {authenticate}  = require('./middleware/authenticate');
 
 app.use(bodyParser.json()); // to parse the json from client
 
@@ -31,10 +32,14 @@ app.post('/users', (req,res)=>{
         user.generateAuthToken().then( (token)=>{
             res.header('x-auth',token).send(user);
         } )
-        //res.send(doc);
     } , (e)=>{
         res.status(400).send(e);
     })
+})
+
+
+app.get('/users/me', authenticate,(req,res)=>{
+   res.send(req.user);
 })
 app.get('/todos' , (req,res)=>{
     console.log('GET REQUEST');
