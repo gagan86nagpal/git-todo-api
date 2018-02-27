@@ -48,6 +48,23 @@ UserSchema.statics.findByToken = function(token){
         'tokens.token':token
     })
 }
+UserSchema.statics.findByCredentials = function(email,password ){
+    var User = this;
+    return User.findOne({email}).then( (user)=>{
+        if(!user){
+            return Promise.reject();
+        }
+        return new Promise ( (resolve,reject)=>{
+            bcrypt.compare(password,user.password, (err,res)=>{
+                if(res){
+                    return resolve(user);
+                } else{
+                    return reject();
+                }
+            })
+        } )
+    } )
+}
 UserSchema.methods.toJSON= function(){
     var user = this;
     var userObject = user.toObject();
@@ -56,9 +73,7 @@ UserSchema.methods.toJSON= function(){
 
 UserSchema.pre('save',function(next){
     var user = this;
-    console.log('AM I HERE');
     if(user.isModified('password')){
-        console.log('pass is modified');
         bcrypt.genSalt(10, (err,salt)=>{
             bcrypt.hash(user.password,salt, (err,hash)=>{
                 console.log(user);
@@ -67,7 +82,6 @@ UserSchema.pre('save',function(next){
             })
         } )
     }else{
-        console.log('password is not modified');
         next();
     }
 })
@@ -81,5 +95,6 @@ UserSchema.methods.generateAuthToken = function(){
     } )
 }
 var User = mongoose.model('User',UserSchema);
+
 
 module.exports = {User};

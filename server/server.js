@@ -41,8 +41,21 @@ app.post('/users', (req,res)=>{
 app.get('/users/me', authenticate,(req,res)=>{
    res.send(req.user);
 })
+app.post('/users/login', (req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    
+   // console.log(User.findByToken);
+    User.findByCredentials(body.email,body.password).then((user)=>{
+        return user.generateAuthToken().then( (token)=>{
+            res.header('x-auth',token).send(user);
+        })
+    } ).catch((e)=>{
+        res.status(400).send();
+    } )
+
+    
+})
 app.get('/todos' , (req,res)=>{
-    console.log('GET REQUEST');
     // Query to fetch all the data from database
     Todo.find().then( (todos)=>{
         res.send(todos);  // send the data back to client (later filter out using authentication)
