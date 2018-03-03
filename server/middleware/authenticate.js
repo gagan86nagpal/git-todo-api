@@ -10,7 +10,7 @@ var authenticate = (req,res,next)=>{
         req.token = token;
         next();
     } ).catch( (e)=>{
-        return res.send(401).send(); 
+        return res.status(401).send(); 
     } );
     
 };
